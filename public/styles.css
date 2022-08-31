@@ -1,0 +1,48 @@
+* {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 62.5%;
+}
+
+body {
+    font-size: 2rem;
+    font-weight: 700;
+    margin:0;
+    padding-top:2em;
+    width: 100vw;
+    height: 100vh;
+    background-color: #4158D0;
+    background-image: radial-gradient( circle farthest-corner at 10% 20%,  rgba(255,94,247,1) 17.8%, rgba(2,245,255,1) 100.2% );
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    font-family: 'Inter', sans-serif;
+    font-family: 'Karla', sans-serif;
+}
+
+main {
+    width: 30vw;
+    min-height:50vh;
+    background: #fff;
+    border: 15px solid #fff;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 12px 28px 0px, rgba(0, 0, 0, 0.1) 0px 2px 4px 0px, rgba(255, 255, 255, 0.05) 0px 0px 0px 1px inset;
+}
+.messageBox{
+    background: #dee2ea;
+    height:60vh;
+    overflow-y: scroll;
+}
+form{
+    margin:1em 0;
+}
+.sent {
+    text-align: left;
+}
+.received {
+    text-align: right;
+}
