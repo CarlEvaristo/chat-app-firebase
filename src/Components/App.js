@@ -20,35 +20,41 @@ const auth = firebase.auth()                                     // initialize f
 const firestore = firebase.firestore()                           // initialize cloud database "firestore"
 
 function SignIn() {                                              // SIGN IN COMPONENT (SIGN IN BUTTON => POPUP)
+
   const signInWithGoogle = () => {
       const provider = new firebase.auth.GoogleAuthProvider()    //determine provider (Google) 
       auth.signInWithPopup(provider)                             //sign in with popup => auth.signInWithPopup(provider)  
   }
-
   const signInAnonymous = () => {
-      auth.signInAnonymously().catch(alert);
+    auth.signInAnonymously().catch(alert);
   }
 
   return (
     <main>
-      <button onClick={signInWithGoogle}>Sign In With Google</button>
-      <button onClick={signInAnonymous}>Sign In Anonymous</button>
+      <span className="inline bold"><i className="fa-solid fa-dove logo"></i> <h1>MessageBird</h1></span>
+      <div className="login">
+        <h2>Sign In</h2>
+        <div className="buttonWrapper">
+          <button onClick={signInWithGoogle}>Sign In With Google</button>
+          <button onClick={signInAnonymous}>Sign In Anonymous</button>
+        </div>
+      </div>
     </main>
   )
 }
 
 function SignOut() {                                              // SIGN OUT COMPONENT (SIGN OUT BUTTON)
   return auth.currentUser && (
-    <button onClick={() => auth.signOut()}>Sign Out</button>  //sign out => auth.SignOut()
+    <button onClick={() => auth.signOut()} className="accent noMargin topRightRadius lessSidePadding">Sign Out</button>  //sign out => auth.SignOut()
   )
 }
 
 function ChatMessage(props) {                        // RECEIVES MESSAGE DATA AS PROP FROM PARENT CHATROOM COMPONENT
-  const {text, uid, id} = props.message              // DESTRUCTURE MESSAGE INTO USER ID AND TEXT
+  const {text, uid} = props.message              // DESTRUCTURE MESSAGE INTO USER ID AND TEXT
   const messageClass = uid === auth.currentUser.uid ? "sent" : "received"   // check of uid in message === uid die is ingelogd 
 
   return (
-    <div className={`message ${messageClass}`}>   {/*de style van ingelogde user is anders dan andere user*/}
+    <div className={`message ${messageClass}`}>   {/*de style van ingelogde user is anders dan vd andere user*/}
       <p>{text}</p>
     </div>
   )
@@ -62,7 +68,7 @@ function Chatroom() {
                                                           // returns array of objects => 1 object = 1 chat message
                                                           // REACT RENDERS WHEN DATA CHANGES IN REALTIME
   const [formValue, setFormValue] = React.useState("")  //1st real React state (for form data)
-  const dummy = React.useRef()        // CREATE A USEREF => TO BE ABLE TO ADDRESS A DIV (INSTEAD OF DIRECT DOM MANIPULATION)
+  // const dummy = React.useRef()        // CREATE A USEREF => TO BE ABLE TO ADDRESS A DIV (INSTEAD OF DIRECT DOM MANIPULATION)
                                             //=> SO I CAN USE .current.scrollIntoView() METHOD ON IT.
 
   async function sendMessage(e) {
@@ -77,34 +83,67 @@ function Chatroom() {
     
     setFormValue("")  //reset form (set state to "" => state dictates form input's value !!!)
 
-    dummy.current.scrollIntoView({behaviour:"smooth"})  //=> MAKES LATEST MESSAGE SCROLL INTO VIEW (MESSAGE BY OTHER PARTY)
+    // dummy.current.scrollIntoView({behaviour:"smooth"})  //=> MAKES LATEST MESSAGE SCROLL INTO VIEW (MESSAGE BY OTHER PARTY)
   }
 
   return (
     <main>
-      <h1>Chat</h1>
+      <span className="inline bold"><i className="fa-solid fa-dove logo"></i> <h1>MessageBird</h1><SignOut /></span>
       <div className="messageBox">             
         {/*SEND REALTIME messages DATA (from useCollectionData DATA HOOK) AS PROP TO CHATMESSAGE COMPONENT*/}                                                             
         {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} /> )} 
-        <div ref={dummy}></div>       {/*LET OP IK GEBRUIK REF EN USEREF IPV DIREKTE DOM MANIPULATION!!!! */}
+        {/*<div ref={dummy}></div>      // LET OP IK GEBRUIK REF EN USEREF IPV DIREKTE DOM MANIPULATION!!!! */}
       </div>
       <form onSubmit={sendMessage}>
-        <input value={formValue} onChange={(e)=>setFormValue(e.target.value)} />   {/* state dictates input value */}
-        <button type="submit" >Send</button>
+        {/* state dictates input value : */}
+        <input value={formValue} onChange={(e)=>setFormValue(e.target.value)} className="noMargin bottomLeftRadius" placeholder="Type your message..."/>   
+        <button type="submit" className="accent noMargin bottomRightRadius" >Send</button>
       </form>
-
-      <SignOut />
     </main>
   )
 }     
 
 function App() {
+  const [email , setemail] = React.useState('');
+  const [password , setpassword] = React.useState('');
+  const handleSignup = ()=>{
+      auth.createUserWithEmailAndPassword(email , password)
+      .then((userCredential)=>{
+          // send verification mail.
+        userCredential.user.sendEmailVerification();
+        auth.signOut();
+        alert("Email sent");
+      })
+      .catch(alert=>console.log(alert));
+  }
+  
+  function handleLogin() {
+    auth.signInWithEmailAndPassword(email, password)
+      .catch((err) => {
+        // switch (err.code) {
+        //   case "auth/Invalid-email":
+        //   case "auth/user-disabled":
+        //   case "auth/user-not-found":
+        //     setEmailError(err.message);
+        //     break;
+        //   case "auth/wrong-password":
+        //     setPasswordError(err.message);
+        //     break;
+        //   default:
+      })
+  }
+    
   const [user] = useAuthState(auth)   // useAuthState USER HOOK => user signed in? => object with user info => not signed in? => null
   
   return (
     <div className="App">
       <header className="App-header">
-      
+
+          <input type="email" placeholder="Email" onChange={(e)=>{setemail(e.target.value)}}></input>
+          <input type="password" placeholder="password" onChange={(e)=>{setpassword(e.target.value)}}></input>
+          <button onClick={handleSignup}>Sign up</button>
+          <button onClick={handleLogin}>Log in</button>
+
       <section>
         {user? <Chatroom /> : <SignIn />}
       </section>
