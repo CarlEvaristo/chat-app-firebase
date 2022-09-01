@@ -36,19 +36,22 @@ h1 {
     font-weight: 400;
     font-size: 3.5rem;
 }
+h2{
+    margin: 0.5em 0;
+}
 form{
     margin:0;
     display: flex;
     justify-content: space-between;
 }
 input {
-    background-color: rgb(241, 241, 241);
+    background-color: #fff;
     font-size: 1.5rem;
     font-weight: 700;
     padding:1em;
     border:none;
-    margin: 0;
-    width:90%
+    width:90%;
+    margin: 0.5em;
 }
 input:hover {
     background-color: rgb(235, 235, 235);
@@ -57,11 +60,12 @@ button {
     background-color: #fff;
     font-size: 1.5rem;
     font-weight: 700;
-    padding:1em 2em;
+    padding:1em;
     border:none;
-    margin: 1em;
     white-space: nowrap;
     word-break: keep-all;
+    width:100%;
+    margin: 0.5em 0;
 }
 button:hover{
     box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
@@ -70,12 +74,28 @@ button:hover{
 button:active{
     box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px inset;
 }
+.doubleBtn {
+    width:48%;
+}
+.signOutBtn {
+    background-color: rgb(241, 241, 241);
+    margin:0;
+    border-top-right-radius: 15px;
+    width:120px;
+}
+.submitBtn {
+    background-color: rgb(241, 241, 241);
+    margin:0;
+    border-bottom-right-radius: 15px;
+    width:120px;
+}
 .login{
     display:flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     background:rgb(241, 241, 241);
+    padding: 1em 0;
 }
 .messageBox{
     box-shadow: rgba(67, 71, 85, 0.27) 0px 0px 0.25em inset, rgba(90, 125, 188, 0.05) 0px 0.25em 1em inset;
@@ -109,7 +129,8 @@ button:active{
 .buttonWrapper {
     display:flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    width:90%;
 }
 /* UTILITY CLASSES */
 
@@ -143,13 +164,17 @@ button:active{
     main {
         width: 60vw;
     }
-    .lessSidePadding {
+    .signOutBtn {
         padding:1em;
     }
 }
 @media (max-width:800px) {
+    .logo {
+        margin-right:0.2em;
+    }
     main {
         width: 90vw;
+        padding:1em;
     }
     h1{
         font-size: 2.5rem;
@@ -157,5 +182,17 @@ button:active{
     .buttonWrapper {
         flex-direction: column;
         align-items: center;
+    }
+    button {
+        width:100%;
+    }
+    .doubleBtn {
+        width:100%;
+    }
+    .signOutBtn {
+        width:90px;
+    }
+    .submitBtn {
+        width:90px;
     }
 }

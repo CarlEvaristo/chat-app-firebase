@@ -29,81 +29,7 @@ function SignIn() {                                              // SIGN IN COMP
     auth.signInAnonymously().catch(alert);
   }
 
-  return (
-    <main>
-      <span className="inline bold"><i className="fa-solid fa-dove logo"></i> <h1>MessageBird</h1></span>
-      <div className="login">
-        <h2>Sign In</h2>
-        <div className="buttonWrapper">
-          <button onClick={signInWithGoogle}>Sign In With Google</button>
-          <button onClick={signInAnonymous}>Sign In Anonymous</button>
-        </div>
-      </div>
-    </main>
-  )
-}
-
-function SignOut() {                                              // SIGN OUT COMPONENT (SIGN OUT BUTTON)
-  return auth.currentUser && (
-    <button onClick={() => auth.signOut()} className="accent noMargin topRightRadius lessSidePadding">Sign Out</button>  //sign out => auth.SignOut()
-  )
-}
-
-function ChatMessage(props) {                        // RECEIVES MESSAGE DATA AS PROP FROM PARENT CHATROOM COMPONENT
-  const {text, uid} = props.message              // DESTRUCTURE MESSAGE INTO USER ID AND TEXT
-  const messageClass = uid === auth.currentUser.uid ? "sent" : "received"   // check of uid in message === uid die is ingelogd 
-
-  return (
-    <div className={`message ${messageClass}`}>   {/*de style van ingelogde user is anders dan vd andere user*/}
-      <p>{text}</p>
-    </div>
-  )
-}
-
-function Chatroom() {
-  const messageRef = firestore.collection("messages")           // LET OP reference to a firestore collection ("messages") 
-                                                                        //=> DEZE HEEFT METHODS OM CRUD THE DOEN OP DB FIRESTORE
-  const query = messageRef.orderBy("createdAt").limit(25)       // query documents in the collection
-  const [messages] = useCollectionData(query, {idField:'id'})   // useCollectionData DATA HOOK: listen to REALTIME update to data
-                                                          // returns array of objects => 1 object = 1 chat message
-                                                          // REACT RENDERS WHEN DATA CHANGES IN REALTIME
-  const [formValue, setFormValue] = React.useState("")  //1st real React state (for form data)
-  // const dummy = React.useRef()        // CREATE A USEREF => TO BE ABLE TO ADDRESS A DIV (INSTEAD OF DIRECT DOM MANIPULATION)
-                                            //=> SO I CAN USE .current.scrollIntoView() METHOD ON IT.
-
-  async function sendMessage(e) {
-    e.preventDefault()
-    const {uid} = auth.currentUser
-
-    await messageRef.add({            // ADD = FIRESTORE CREATE COMMAND => CREATE NEW DOCUMENT
-      text: formValue,               // TAKES A JS OBJECT AS ARGUMENT => CONTAINING WHATEVER DATA YOU WANT
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),   // firebase can give us its server timestamp
-      uid 
-    })     
-    
-    setFormValue("")  //reset form (set state to "" => state dictates form input's value !!!)
-
-    // dummy.current.scrollIntoView({behaviour:"smooth"})  //=> MAKES LATEST MESSAGE SCROLL INTO VIEW (MESSAGE BY OTHER PARTY)
-  }
-
-  return (
-    <main>
-      <span className="inline bold"><i className="fa-solid fa-dove logo"></i> <h1>MessageBird</h1><SignOut /></span>
-      <div className="messageBox">             
-        {/*SEND REALTIME messages DATA (from useCollectionData DATA HOOK) AS PROP TO CHATMESSAGE COMPONENT*/}                                                             
-        {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} /> )} 
-        {/*<div ref={dummy}></div>      // LET OP IK GEBRUIK REF EN USEREF IPV DIREKTE DOM MANIPULATION!!!! */}
-      </div>
-      <form onSubmit={sendMessage}>
-        {/* state dictates input value : */}
-        <input value={formValue} onChange={(e)=>setFormValue(e.target.value)} className="noMargin bottomLeftRadius" placeholder="Type your message..."/>   
-        <button type="submit" className="accent noMargin bottomRightRadius" >Send</button>
-      </form>
-    </main>
-  )
-}     
-
-function App() {
+  //next code for email/ pw sign-in/ log-in
   const [email , setemail] = React.useState('');
   const [password , setpassword] = React.useState('');
   const handleSignup = ()=>{
@@ -132,17 +58,96 @@ function App() {
         //   default:
       })
   }
+
+  return (
+    <main>
+      <span className="inline bold"><i className="fa-solid fa-dove logo"></i> <h1>MessageBird</h1></span>
+      <div className="login">
+        <h3>Sign In With Google</h3>
+        <div className="buttonWrapper">
+          <button onClick={signInWithGoogle}>Sign In With Google</button>
+          {/* <button onClick={signInAnonymous}>Sign In Anonymous</button> */}
+        </div>
+        <h3>Sign Up With Email</h3>
+        <input type="email" placeholder="Email" onChange={(e)=>{setemail(e.target.value)}}></input>
+        <input type="password" placeholder="password" onChange={(e)=>{setpassword(e.target.value)}}></input>
+        <div className="buttonWrapper">
+          <button onClick={handleSignup} className="doubleBtn">Sign up</button>
+          <button onClick={handleLogin} className="doubleBtn">Log in</button>
+        </div>
+      </div>
+    </main>
+  )
+}
+
+function SignOut() {             // SIGN OUT COMPONENT (SIGN OUT BUTTON)
+  return auth.currentUser && (
+    <button onClick={() => auth.signOut()} className="button signOutBtn">Sign Out</button>  //sign out => auth.SignOut()
+  )
+}
+
+function ChatMessage(props) {                        // RECEIVES MESSAGE DATA AS PROP FROM PARENT CHATROOM COMPONENT
+  const {text, uid} = props.message              // DESTRUCTURE MESSAGE INTO USER ID AND TEXT
+  const messageClass = uid === auth.currentUser.uid ? "sent" : "received"   // check of uid in message === uid die is ingelogd 
+
+  return (
+    <div className={`message ${messageClass}`}>   {/*de style van ingelogde user is anders dan vd andere user*/}
+      <p>{text}</p>
+    </div>
+  )
+}
+
+function Chatroom() {
+  const messageRef = firestore.collection("messages")           // LET OP reference to a firestore collection ("messages") 
+                                                                        //=> DEZE HEEFT METHODS OM CRUD THE DOEN OP DB FIRESTORE
+  // const query = messageRef.orderBy("createdAt").limit(25)       // query documents in the collection
+  // const [messages] = useCollectionData(query, {idField:'id'})   // useCollectionData DATA HOOK: listen to REALTIME update to data
+                                                                   // returns array of objects => 1 object = 1 chat message // REACT RENDERS WHEN DATA CHANGES IN REALTIME
+  const query = messageRef.orderBy("createdAt")  //let op limit 25 weggehaald                  
+  const [messages] = useCollectionData(query, {idField:'id'})  //messageRef IPV query => om alle date te krijgen
+  const [formValue, setFormValue] = React.useState("")  //1st real React state (for form data)
+  const dummy = React.useRef()        // CREATE A USEREF => TO BE ABLE TO ADDRESS A DIV (INSTEAD OF DIRECT DOM MANIPULATION)
+                                            //=> SO I CAN USE .current.scrollIntoView() METHOD ON IT.
+
+  async function sendMessage(e) {
+    e.preventDefault()
+    const {uid} = auth.currentUser
+
+    await messageRef.add({            // ADD = FIRESTORE CREATE COMMAND => CREATE NEW DOCUMENT
+      text: formValue,               // TAKES A JS OBJECT AS ARGUMENT => CONTAINING WHATEVER DATA YOU WANT
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),   // firebase can give us its server timestamp
+      uid 
+    })     
     
+    setFormValue("")  //reset form (set state to "" => state dictates form input's value !!!)
+
+    dummy.current.scrollIntoView({behaviour:"smooth"})  //=> MAKES LATEST MESSAGE SCROLL INTO VIEW (MESSAGE BY OTHER PARTY)
+  }
+
+  return (
+    <main>
+      <span className="inline bold"><i className="fa-solid fa-dove logo"></i> <h1>MessageBird</h1><SignOut /></span>
+      <div className="messageBox">             
+        {/*SEND REALTIME messages DATA (from useCollectionData DATA HOOK) AS PROP TO CHATMESSAGE COMPONENT*/}                                                             
+        {messages && messages.map(msg => <ChatMessage key={msg.createdAt} message={msg} />  )} 
+        <div ref={dummy}></div>      {/*  LET OP IK GEBRUIK REF EN USEREF IPV DIREKTE DOM MANIPULATION!!!! */}
+      </div>
+      <form onSubmit={sendMessage}>
+        {/* state dictates input value : */}
+        <input value={formValue} onChange={(e)=>setFormValue(e.target.value)} className="accent noMargin bottomLeftRadius" placeholder="Type your message..."/>   
+        <button type="submit" className="submitBtn" >Send</button>
+      </form>
+    </main>
+  )
+}     
+
+function App() {
+
   const [user] = useAuthState(auth)   // useAuthState USER HOOK => user signed in? => object with user info => not signed in? => null
   
   return (
     <div className="App">
       <header className="App-header">
-
-          <input type="email" placeholder="Email" onChange={(e)=>{setemail(e.target.value)}}></input>
-          <input type="password" placeholder="password" onChange={(e)=>{setpassword(e.target.value)}}></input>
-          <button onClick={handleSignup}>Sign up</button>
-          <button onClick={handleLogin}>Log in</button>
 
       <section>
         {user? <Chatroom /> : <SignIn />}
