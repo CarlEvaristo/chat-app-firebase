@@ -124,6 +124,10 @@ function Chatroom() {
     dummy.current.scrollIntoView({behaviour:"smooth"})  //=> MAKES LATEST MESSAGE SCROLL INTO VIEW (MESSAGE BY OTHER PARTY)
   }
 
+  React.useEffect(()=>{
+    dummy.current.scrollIntoView({behaviour:"smooth"})
+  },[messages])
+
   return (
     <main>
       <span className="inline bold"><i className="fa-solid fa-dove logo"></i> <h1>MessageBird</h1><SignOut /></span>
